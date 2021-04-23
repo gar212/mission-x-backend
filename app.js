@@ -7,9 +7,6 @@ const PORT = 5000;
 const app = express();
 app.use(cors());
 
-
-const yourQuery = `SELECT * FROM User`;
-
 // A simple query
 const runDBQuery = (yourQuery) => {
   return db.promise().query(yourQuery);
@@ -19,13 +16,28 @@ const runDBQuery = (yourQuery) => {
 const parseResultToJSON = (resultRowsArray) =>
   resultRowsArray.map((mysqlObj) => Object.assign({}, mysqlObj));
 
-// When a API request is made to localhost:3000, the DB query is executed
-app.get("/", (req, res) => {
+
+const getProfilePic = async (req, res) => {
+  const { id } = req.params;
+  const queryResult = await getUserProfilePic(id);
+  const jsonResult = resultToJSON(queryResult);
+
+  const { image, mimeType } = jsonResult[0];
+  const encoding = 'base64';
+  // Data URIs - https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+  // Structure of the URI || data:[<mime type>][;charset=<charset>][;base64],<encoded data>
+  // Example              || data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABNwAAAKmCAYAA...
+  const uri = `data:${mimeType};${encoding},${image}`;
+  res.status(200).send({ dataURI: uri });
+};
+
+
+app.get("/progresstracker", (req, res) => {
+  const yourQuery = `SELECT * FROM User WHERE Role = 'student' `;
   runDBQuery(yourQuery)
     .then((queryResult, fields) => {
       const [rows] = queryResult;
       const jsonResults = parseResultToJSON(rows);
-      console.log("Sending response for GET", jsonResults);
       // Sends the response if query was successful.
       res.send(jsonResults);
     })
@@ -36,6 +48,29 @@ app.get("/", (req, res) => {
     });
 });
 
-app.listen(process.env.PORT || PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
-})
+app.get("/studentprofiles", (req, res) => {
+  const yourQuery = `SELECT * FROM User WHERE Role = 'student' `;
+  runDBQuery(yourQuery)
+    .then((queryResult, fields) => {
+      const [rows] = queryResult;
+      const jsonResults = parseResultToJSON(rows);
+      // Sends the response if query was successful.
+      res.send(jsonResults);
+    })
+    .catch((error) => {
+      console.log(error);
+      // Sends an error if the query returned an error.
+      res.status(500).send(error);
+    });
+});
+
+// Starting the server after connecting to DB
+const startServer = async () => {
+  try {
+    app.listen(process.env.PORT || PORT, () => console.log(`Server running on port ${PORT}!`));
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+startServer();
