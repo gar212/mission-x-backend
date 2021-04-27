@@ -16,22 +16,8 @@ const runDBQuery = (yourQuery) => {
 const parseResultToJSON = (resultRowsArray) =>
   resultRowsArray.map((mysqlObj) => Object.assign({}, mysqlObj));
 
-const getProfilePic = async (req, res) => {
-  const {id} = req.params;
-  const queryResult = await getUserProfilePic(id);
-  const jsonResult = resultToJSON(queryResult);
-
-  const {image, mimeType} = jsonResult[0];
-  const encoding = "base64";
-  // Data URIs - https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
-  // Structure of the URI || data:[<mime type>][;charset=<charset>][;base64],<encoded data>
-  // Example              || data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABNwAAAKmCAYAA...
-  const uri = `data:${mimeType};${encoding},${image}`;
-  res.status(200).send({dataURI: uri});
-};
-
 app.get("/progresstracker", (req, res) => {
-  const yourQuery = `SELECT * FROM User WHERE Role = 'student' `;
+  const yourQuery = `SELECT UserID, FirstName,LastName FROM User WHERE Role = 'student' `;
   runDBQuery(yourQuery)
     .then((queryResult, fields) => {
       const [rows] = queryResult;
