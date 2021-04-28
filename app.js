@@ -17,7 +17,9 @@ const parseResultToJSON = (resultRowsArray) =>
   resultRowsArray.map((mysqlObj) => Object.assign({}, mysqlObj));
 
 app.get("/progresstracker", (req, res) => {
-  const yourQuery = `SELECT UserID, FirstName,LastName FROM User WHERE Role = 'student' `;
+  const yourQuery = `Select UserID, group_concat(ProgressHistory.Project_ProjectID) as ProjectDone, FirstName, LastName from User 
+Left join ProgressHistory on (User.UserID = ProgressHistory.User_UserID) WHERE User.Role = 'student'
+Group by 1;`;
   runDBQuery(yourQuery)
     .then((queryResult, fields) => {
       const [rows] = queryResult;
