@@ -66,7 +66,7 @@ app.get("/projectbuilder", (req, res) => {
 });
 
 app.get("/helprequests", (req, res) => {
-  const yourQuery = `SELECT * FROM StudentDB.HelpRequest`;
+  const yourQuery = `SELECT * FROM StudentDB.HelpRequest' `;
   runDBQuery(yourQuery)
     .then((queryResult, fields) => {
       const [rows] = queryResult;
