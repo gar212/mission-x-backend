@@ -1,11 +1,9 @@
 const express = require("express");
 const db = require("./config/db");
-const cors = require("cors");
 const mysql = require("mysql2");
 
 const PORT = 5000;
 const app = express();
-app.use(cors());
 
 // A simple query
 const runDBQuery = (yourQuery) => {
