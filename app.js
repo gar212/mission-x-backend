@@ -68,7 +68,7 @@ app.get("/projectbuilder", (req, res) => {
 });
 
 app.get("/helprequests", (req, res) => {
-  const yourQuery = `Select UserID, FirstName, LastName, ProfilePic, HelpRequest.DateCreated from User left join HelpRequest on (User.UserID = HelpRequest.User_UserID) WHERE DateCreated is NOT NULL;`;
+  const yourQuery = `Select UserID, FirstName, LastName, ProfilePic, date_format(DateCreated, '%Y-%m-%d') as `date`, date_format(DateCreated, '%H:%i:%s') as `time`, HelpRequest.DateCreated from User left join HelpRequest on (User.UserID = HelpRequest.User_UserID) WHERE DateCreated is NOT NULL;`;
   runDBQuery(yourQuery)
     .then((queryResult, fields) => {
       const [rows] = queryResult;
