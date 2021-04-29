@@ -33,7 +33,7 @@ Group by 1;`;
 });
 
 app.get("/studentprofiles", (req, res) => {
-  const yourQuery = `SELECT * FROM User WHERE Role = 'student' `;
+  const yourQuery = `SELECT UserID, FirstName, LastName, Email, Password, School, ProfilePic, TeacherID, date_format(DateOfBirth, '%d-%M-%Y'), ContactNumber, Email, Role FROM User WHERE Role = 'student'`;
   runDBQuery(yourQuery)
     .then((queryResult, fields) => {
       const [rows] = queryResult;
