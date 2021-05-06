@@ -5,6 +5,7 @@ const mysql = require("mysql2");
 const PORT = 5000;
 const app = express();
 
+app.use(express.json());
 // A simple query
 const runDBQuery = (yourQuery) => {
   return db.promise().query(yourQuery);
@@ -14,10 +15,36 @@ const runDBQuery = (yourQuery) => {
 const parseResultToJSON = (resultRowsArray) =>
   resultRowsArray.map((mysqlObj) => Object.assign({}, mysqlObj));
 
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+  const yourQuery =
+    "SELECT Password FROM StudentDB.User where Email = '" + email   + "';";
+  runDBQuery(yourQuery)
+    .then((queryResult, fields) => {
+      const [rows] = queryResult;
+      const jsonResults = parseResultToJSON(rows);
+      console.log(jsonResults)
+      if (jsonResults.length === 0) {
+        res
+          .status(401)
+          .send("Could not find a user with the provided email id");
+      } else {
+        if (password == jsonResults[0].Password) {
+          res.status(200).send("Successfully logged in user!");
+        } else {
+          res.status(401).send("Invalid password.");
+        }
+      } // Sends the response if query was successful.
+    })
+    .catch((error) => {
+      console.log(error);
+      // Sends an error if the query returned an error.
+      res.status(500).send(error);
+    });
+});
 app.get("/progresstracker", (req, res) => {
-  const yourQuery = `Select UserID, group_concat(ProgressHistory.Project_ProjectID) as ProjectDone, FirstName, LastName from User 
-Left join ProgressHistory on (User.UserID = ProgressHistory.User_UserID) WHERE User.Role = 'student'
-Group by 1;`;
+  const yourQuery =
+    "SELECT Password FROM StudentDB.User where Email = 'aiden.andrews@mrhq.com';";
   runDBQuery(yourQuery)
     .then((queryResult, fields) => {
       const [rows] = queryResult;
